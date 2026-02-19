@@ -10,7 +10,7 @@ You are running on the host machine in the repo root. The `maxassist/` subdirect
 
 ## Folder Structure
 
-- `maxassist/config/` — Environment files. `slack.env` for Slack, `grafana.env` for Grafana Loki.
+- `maxassist/config/` — Environment files and data. `slack.env` for Slack, `grafana.env` for Grafana Loki, `reminders.json` for one-time reminders.
 - `maxassist/scripts/` — All executable scripts. You write new scripts here.
 - `maxassist/memory/` — Persistent context. Always update `maxassist/memory/context.md` after making changes.
 - `maxassist/output/` — Runtime output from scripts (logs, reports, JSON).
@@ -63,6 +63,28 @@ After every session where you make changes, update `maxassist/memory/context.md`
 - What was added/changed/removed
 - Current active scripts and their schedules
 - Any decisions made and why
+
+### Managing Reminders
+One-time reminders are stored in `maxassist/config/reminders.json` and posted daily to Slack by cron. Use the `/reminder` slash command or run directly:
+```bash
+# List all reminders
+docker exec maxassist /maxassist/scripts/reminders.sh list
+
+# Mark one done
+docker exec maxassist /maxassist/scripts/reminders.sh done <id>
+
+# Add a new reminder (optionally with a start date)
+docker exec maxassist /maxassist/scripts/reminders.sh add "Do the thing"
+docker exec maxassist /maxassist/scripts/reminders.sh add "Do the thing" 2025-06-01
+```
+
+Each reminder has:
+- `id` — slug for referencing
+- `text` — what to do
+- `status` — `pending` or `done`
+- `remind_from` (optional) — `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`. Reminder stays silent until this date/time.
+
+Schedule `reminders.sh check` in cron (e.g. `0 9 * * *`). It posts all active pending reminders to Slack. If none are pending (or all are waiting), it stays silent.
 
 ### Using External AI APIs
 For tasks that need AI reasoning (summarization, classification), write scripts that call cheap external APIs (e.g. OpenAI gpt-4o-mini). Store API keys in `maxassist/config/` env files. Never hardcode secrets in scripts.

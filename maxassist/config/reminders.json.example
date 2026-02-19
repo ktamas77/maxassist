@@ -1,0 +1,4 @@
+[
+  {"id": "example-task", "text": "Example reminder — delete this and add your own", "status": "pending", "created": "2025-01-01"},
+  {"id": "future-task", "text": "This only shows up after the remind_from date", "status": "pending", "created": "2025-01-01", "remind_from": "2025-06-01"}
+]

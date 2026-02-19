@@ -61,11 +61,14 @@ repo root/
     ├── config/
     │   ├── slack.env.example         # Template — copy to slack.env
     │   ├── slack.env                 # Your Slack bot token (gitignored)
-    │   └── grafana.env              # Grafana Loki credentials (gitignored)
+    │   ├── grafana.env              # Grafana Loki credentials (gitignored)
+    │   ├── reminders.json.example   # Template — copy to reminders.json
+    │   └── reminders.json           # One-time reminders (gitignored)
     ├── scripts/
     │   ├── entrypoint.sh              # Loads crontab and starts cron
     │   ├── slack-post.sh             # Slack posting helper
     │   ├── loki-query.sh             # Grafana Loki log query helper
+    │   ├── reminders.sh             # One-time reminder system
     │   └── example-health-check.sh   # Reference template
     ├── memory/
     │   └── context.md                # Claude maintains this across sessions
@@ -79,6 +82,7 @@ repo root/
 **Deterministic tasks** (no AI needed, no extra cost):
 - Health checks and uptime monitoring
 - Log monitoring via Grafana Loki (errors, patterns, anomalies)
+- One-time reminders with deferred start dates (`/reminder` slash command)
 - Backup verification and disk usage alerts
 - Scheduled reports from APIs
 - Data fetching and formatting
@@ -106,6 +110,8 @@ subprocess.run(["/maxassist/scripts/slack-post.sh", "#alerts", response.choices[
 
 - **[Slack Setup](docs/slack-setup.md)** — Create a Slack app, configure bot tokens, and connect MaxAssist
 - **[Grafana Loki Setup](docs/grafana-loki-setup.md)** — Connect to Grafana Cloud Loki for log querying
+- **Reminders** — See `reminders.json.example` and the Managing Reminders section in CLAUDE.md
+- **Slash Commands** — `/reminder` for managing one-time reminders (see `.claude/commands/`)
 - **Session Logs** — Claude logs every session to `docs/log-YYYY-MM-DD.md` (see CLAUDE.md for details)
 
 ## Customizing
