@@ -11,9 +11,9 @@ You run Claude Code CLI on your machine — Anthropic's official tool, used exac
 git clone https://github.com/ktamas77/maxassist.git
 cd maxassist
 
-# 2. Configure Slack
+# 2. Configure Slack (see docs/slack-setup.md for full guide)
 cp maxassist/config/slack.env.example maxassist/config/slack.env
-# Edit maxassist/config/slack.env with your webhook URL
+# Edit maxassist/config/slack.env with your bot token
 
 # 3. Start the execution container
 docker compose up -d
@@ -61,7 +61,7 @@ repo root/
 └── maxassist/                        ◀── mounted as /maxassist in container
     ├── config/
     │   ├── slack.env.example         # Template — copy to slack.env
-    │   └── slack.env                 # Your Slack webhook (gitignored)
+    │   └── slack.env                 # Your Slack bot token (gitignored)
     ├── scripts/
     │   ├── slack-post.sh             # Slack posting helper
     │   └── example-health-check.sh   # Reference template
@@ -96,9 +96,14 @@ response = client.chat.completions.create(
     messages=[{"role": "user", "content": f"Summarize these logs:\n{logs}"}]
 )
 
-webhook = os.environ["SLACK_WEBHOOK_URL"]
-requests.post(webhook, json={"text": response.choices[0].message.content})
+import subprocess
+subprocess.run(["/maxassist/scripts/slack-post.sh", "#alerts", response.choices[0].message.content])
 ```
+
+## Documentation
+
+- **[Slack Setup](docs/slack-setup.md)** — Create a Slack app, configure bot tokens, and connect MaxAssist
+- **Session Logs** — Claude logs every session to `docs/log-YYYY-MM-DD.md` (see CLAUDE.md for details)
 
 ## Customizing
 
