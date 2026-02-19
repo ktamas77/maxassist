@@ -57,13 +57,13 @@ repo root/
 ├── CLAUDE.md                         # Claude Code reads this automatically
 ├── Dockerfile
 ├── docker-compose.yml
-├── entrypoint.sh                     # Loads crontab on container start
 └── maxassist/                        ◀── mounted as /maxassist in container
     ├── config/
     │   ├── slack.env.example         # Template — copy to slack.env
     │   ├── slack.env                 # Your Slack bot token (gitignored)
     │   └── grafana.env              # Grafana Loki credentials (gitignored)
     ├── scripts/
+    │   ├── entrypoint.sh              # Loads crontab and starts cron
     │   ├── slack-post.sh             # Slack posting helper
     │   ├── loki-query.sh             # Grafana Loki log query helper
     │   └── example-health-check.sh   # Reference template
