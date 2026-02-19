@@ -42,22 +42,22 @@ You ──▶ claude (CLI)                  cron (PID 1, always running)
         ├── docker exec: add cron
         └── updates memory/
 
-   ◀── shared volumes ──▶
-   config/ scripts/ memory/ output/
+   ◀── single volume mount (.:/maxassist) ──▶
 ```
 
 - **Claude Code** runs natively on your host — already authenticated with your Max subscription
 - **The container** is a lightweight Debian environment running cron, with curl, jq, python3, and bash
-- **Shared volumes** mean Claude writes files on the host and the container sees them immediately
+- **Single volume mount** maps the entire project folder into the container — Claude writes files on the host and the container sees them immediately
 - **No Claude CLI inside the container** — the container is purely an execution runtime
 
 ## Project Structure
 
 ```
-maxassist/
+maxassist/                            ◀── mounted as /maxassist in container
 ├── CLAUDE.md                     # Claude Code reads this automatically
 ├── Dockerfile
 ├── docker-compose.yml
+├── entrypoint.sh                 # Loads crontab on container start
 ├── config/
 │   ├── slack.env.example         # Template — copy to slack.env
 │   └── slack.env                 # Your Slack webhook (gitignored)
@@ -68,7 +68,7 @@ maxassist/
 │   └── context.md                # Claude maintains this across sessions
 ├── output/                       # Runtime output from scripts (gitignored)
 └── cron/
-    └── crontab.txt               # Mirror of active crontab
+    └── crontab.txt               # Persisted crontab — loaded on container start
 ```
 
 ## What You Can Build
