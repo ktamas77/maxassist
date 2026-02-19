@@ -10,7 +10,7 @@ You are running on the host machine in the repo root. The `maxassist/` subdirect
 
 ## Folder Structure
 
-- `maxassist/config/` — Environment files. `slack.env` contains Slack webhook credentials.
+- `maxassist/config/` — Environment files. `slack.env` for Slack, `grafana.env` for Grafana Loki.
 - `maxassist/scripts/` — All executable scripts. You write new scripts here.
 - `maxassist/memory/` — Persistent context. Always update `maxassist/memory/context.md` after making changes.
 - `maxassist/output/` — Runtime output from scripts (logs, reports, JSON).
@@ -25,6 +25,13 @@ You are running on the host machine in the repo root. The `maxassist/` subdirect
 - Scripts should be self-contained and idempotent.
 - Write output/logs to `/maxassist/output/` (container path).
 - Source `/maxassist/config/slack.env` for Slack credentials (container path).
+
+### Querying Logs
+Query Grafana Loki logs from inside the container:
+```bash
+/maxassist/scripts/loki-query.sh <service_name> [--since <duration>] [--limit <n>] [--grep <pattern>]
+```
+See `docs/grafana-loki-setup.md` for full setup and usage.
 
 ### Posting to Slack
 Use the included helper (from inside the container):
