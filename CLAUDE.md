@@ -60,6 +60,23 @@ After every session where you make changes, update `maxassist/memory/context.md`
 ### Using External AI APIs
 For tasks that need AI reasoning (summarization, classification), write scripts that call cheap external APIs (e.g. OpenAI gpt-4o-mini). Store API keys in `maxassist/config/` env files. Never hardcode secrets in scripts.
 
+## Session Logging
+
+**IMPORTANT**: After completing each user request, append a summary to the daily log file:
+- File: `docs/log-YYYY-MM-DD.md` (use today's date)
+- Create the file if it doesn't exist, with header `# Session Log — YYYY-MM-DD`
+- Each session/task gets a `## Session N` or `### Task description` header
+- Log what was done: files created/modified, commands run, decisions made
+- Keep entries concise but complete enough to reconstruct what happened
+
+Example entry:
+```markdown
+### Created health check script
+- Added `maxassist/scripts/health-check.sh`
+- Scheduled at `*/30 * * * *` in crontab
+- Posts alerts to #gerty-assistant on failure
+```
+
 ## Important
 - Scripts execute inside the container, not on the host. Use `docker exec` to run or test them.
 - Cron runs as PID 1 in the container — it's always active as long as the container is running.
