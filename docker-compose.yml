@@ -1,0 +1,13 @@
+services:
+  maxassist:
+    build: .
+    container_name: maxassist
+    restart: unless-stopped
+    env_file:
+      - config/slack.env
+    volumes:
+      - ./config:/maxassist/config
+      - ./scripts:/maxassist/scripts
+      - ./memory:/maxassist/memory
+      - ./output:/maxassist/output
+      - ./cron:/maxassist/cron

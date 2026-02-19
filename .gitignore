@@ -1,0 +1,5 @@
+config/slack.env
+config/*.env
+!config/*.env.example
+output/*
+!output/.gitkeep

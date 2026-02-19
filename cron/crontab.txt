@@ -1,0 +1,3 @@
+# MaxAssist cron schedule
+# This file mirrors the active crontab. Claude keeps it in sync.
+# Format: minute hour day month weekday command
