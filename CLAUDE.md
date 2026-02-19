@@ -1,35 +1,35 @@
 # MaxAssist — Claude Code Instructions
 
-You are running on the host machine inside the `maxassist/` project folder. A Docker container (`maxassist`) runs alongside you as the execution environment — it handles cron scheduling and script execution in a predictable Debian Linux environment.
+You are running on the host machine in the repo root. The `maxassist/` subdirectory contains all runtime data and is mounted into the Docker container at `/maxassist/`.
 
 ## Architecture
 
-- **You (Claude Code)** run on the host. You read/write files in this project folder.
+- **You (Claude Code)** run on the host. You read/write files under `maxassist/`.
 - **The container** runs cron as PID 1. Scripts and cron jobs execute inside it.
-- **Volumes are shared** — files you write to `scripts/`, `config/`, `memory/`, `output/` are immediately available inside the container.
+- **Volume mount** — `maxassist/` on the host is mounted as `/maxassist/` in the container. Changes are immediate.
 
 ## Folder Structure
 
-- `config/` — Environment files. `slack.env` contains Slack webhook credentials.
-- `scripts/` — All executable scripts. You write new scripts here.
-- `memory/` — Persistent context. Always update `memory/context.md` after making changes.
-- `output/` — Runtime output from scripts (logs, reports, JSON).
-- `cron/` — `crontab.txt` mirrors the active crontab inside the container.
+- `maxassist/config/` — Environment files. `slack.env` contains Slack webhook credentials.
+- `maxassist/scripts/` — All executable scripts. You write new scripts here.
+- `maxassist/memory/` — Persistent context. Always update `maxassist/memory/context.md` after making changes.
+- `maxassist/output/` — Runtime output from scripts (logs, reports, JSON).
+- `maxassist/cron/` — `crontab.txt` mirrors the active crontab inside the container.
 
 ## Conventions
 
 ### Writing Scripts
-- Write scripts to `scripts/` as bash or python.
-- Make them executable: `chmod +x scripts/your-script.sh`
+- Write scripts to `maxassist/scripts/` as bash or python.
+- Make them executable: `chmod +x maxassist/scripts/your-script.sh`
 - Scripts run inside the container at `/maxassist/scripts/`.
 - Scripts should be self-contained and idempotent.
-- Write output/logs to `output/`.
-- Source `config/slack.env` for Slack credentials.
+- Write output/logs to `/maxassist/output/` (container path).
+- Source `/maxassist/config/slack.env` for Slack credentials (container path).
 
 ### Posting to Slack
-Use the included helper:
+Use the included helper (from inside the container):
 ```bash
-scripts/slack-post.sh "#channel" "Your message here"
+/maxassist/scripts/slack-post.sh "#channel" "Your message here"
 ```
 
 ### Managing Cron
@@ -42,8 +42,8 @@ docker exec maxassist crontab -l
 docker exec maxassist bash -c '(crontab -l 2>/dev/null; echo "*/30 * * * * /maxassist/scripts/your-script.sh") | crontab -'
 ```
 After any cron change:
-1. Update `cron/crontab.txt` to mirror the active crontab
-2. Log the change in `memory/context.md`
+1. Update `maxassist/cron/crontab.txt` to mirror the active crontab
+2. Log the change in `maxassist/memory/context.md`
 
 ### Running Scripts Manually
 Test scripts inside the container before scheduling:
@@ -52,13 +52,13 @@ docker exec maxassist /maxassist/scripts/your-script.sh
 ```
 
 ### Updating Memory
-After every session where you make changes, update `memory/context.md` with:
+After every session where you make changes, update `maxassist/memory/context.md` with:
 - What was added/changed/removed
 - Current active scripts and their schedules
 - Any decisions made and why
 
 ### Using External AI APIs
-For tasks that need AI reasoning (summarization, classification), write scripts that call cheap external APIs (e.g. OpenAI gpt-4o-mini). Store API keys in `config/` env files. Never hardcode secrets in scripts.
+For tasks that need AI reasoning (summarization, classification), write scripts that call cheap external APIs (e.g. OpenAI gpt-4o-mini). Store API keys in `maxassist/config/` env files. Never hardcode secrets in scripts.
 
 ## Important
 - Scripts execute inside the container, not on the host. Use `docker exec` to run or test them.

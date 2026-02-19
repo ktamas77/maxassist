@@ -4,6 +4,6 @@ services:
     container_name: maxassist
     restart: unless-stopped
     env_file:
-      - config/slack.env
+      - maxassist/config/slack.env
     volumes:
-      - .:/maxassist
+      - ./maxassist:/maxassist

@@ -20,8 +20,8 @@ RUN mkdir -p /maxassist/config \
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-COPY scripts/ /maxassist/scripts/
-COPY cron/crontab.txt /maxassist/cron/crontab.txt
+COPY maxassist/scripts/ /maxassist/scripts/
+COPY maxassist/cron/crontab.txt /maxassist/cron/crontab.txt
 
 RUN chmod +x /maxassist/scripts/*.sh
 

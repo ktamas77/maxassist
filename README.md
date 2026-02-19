@@ -12,8 +12,8 @@ git clone https://github.com/ktamas77/maxassist.git
 cd maxassist
 
 # 2. Configure Slack
-cp config/slack.env.example config/slack.env
-# Edit config/slack.env with your webhook URL
+cp maxassist/config/slack.env.example maxassist/config/slack.env
+# Edit maxassist/config/slack.env with your webhook URL
 
 # 3. Start the execution container
 docker compose up -d
@@ -31,44 +31,45 @@ Claude writes a script, adds a cron entry inside the container, and updates its 
 ## How It Works
 
 ```
-Host machine                          Docker container (maxassist)
-─────────────                         ──────────────────────────────
+Repo root (host)                      Docker container
+────────────────                      ──────────────────────────────
 
 You ──▶ claude (CLI)                  cron (PID 1, always running)
         │                               │
         ├── reads CLAUDE.md             ├── executes scripts on schedule
-        ├── reads memory/context.md     ├── scripts post to Slack
-        ├── writes scripts/new.sh       └── scripts write to output/
+        ├── reads maxassist/memory/     ├── scripts post to Slack
+        ├── writes maxassist/scripts/   └── scripts write to output/
         ├── docker exec: add cron
-        └── updates memory/
+        └── updates maxassist/memory/
 
-   ◀── single volume mount (.:/maxassist) ──▶
+   ◀── volume mount (./maxassist:/maxassist) ──▶
 ```
 
 - **Claude Code** runs natively on your host — already authenticated with your Max subscription
 - **The container** is a lightweight Debian environment running cron, with curl, jq, python3, and bash
-- **Single volume mount** maps the entire project folder into the container — Claude writes files on the host and the container sees them immediately
+- **Single volume mount** maps `maxassist/` into the container at `/maxassist/` — Claude writes files on the host and the container sees them immediately
 - **No Claude CLI inside the container** — the container is purely an execution runtime
 
 ## Project Structure
 
 ```
-maxassist/                            ◀── mounted as /maxassist in container
-├── CLAUDE.md                     # Claude Code reads this automatically
+repo root/
+├── CLAUDE.md                         # Claude Code reads this automatically
 ├── Dockerfile
 ├── docker-compose.yml
-├── entrypoint.sh                 # Loads crontab on container start
-├── config/
-│   ├── slack.env.example         # Template — copy to slack.env
-│   └── slack.env                 # Your Slack webhook (gitignored)
-├── scripts/
-│   ├── slack-post.sh             # Slack posting helper
-│   └── example-health-check.sh   # Reference template
-├── memory/
-│   └── context.md                # Claude maintains this across sessions
-├── output/                       # Runtime output from scripts (gitignored)
-└── cron/
-    └── crontab.txt               # Persisted crontab — loaded on container start
+├── entrypoint.sh                     # Loads crontab on container start
+└── maxassist/                        ◀── mounted as /maxassist in container
+    ├── config/
+    │   ├── slack.env.example         # Template — copy to slack.env
+    │   └── slack.env                 # Your Slack webhook (gitignored)
+    ├── scripts/
+    │   ├── slack-post.sh             # Slack posting helper
+    │   └── example-health-check.sh   # Reference template
+    ├── memory/
+    │   └── context.md                # Claude maintains this across sessions
+    ├── output/                       # Runtime output from scripts (gitignored)
+    └── cron/
+        └── crontab.txt               # Persisted crontab — loaded on container start
 ```
 
 ## What You Can Build
@@ -103,7 +104,7 @@ requests.post(webhook, json={"text": response.choices[0].message.content})
 
 Edit `CLAUDE.md` to shape how Claude behaves — define your services, set conventions, specify preferred languages, add custom reporting rules. Claude reads it automatically every session.
 
-`memory/context.md` is maintained by Claude across sessions — it tracks what's set up, decisions made, and current state.
+`maxassist/memory/context.md` is maintained by Claude across sessions — it tracks what's set up, decisions made, and current state.
 
 ## TOS Compliance
 
